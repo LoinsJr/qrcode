@@ -5,6 +5,7 @@
 DIVIDEND_POLYNOMIAL_SIZE equ 16
 DIVIDER_POLYNOMIAL_SIZE  equ 11
 CODEWORDS_AMOUNT         equ 10
+FIELD_ORDER              equ 255
 .data
 dividend_polynomial db 26 dup(0)
 divider_polynomial  db 1, 216, 194, 159, 111, 199, 94, 95, 113, 157, 193
@@ -71,7 +72,7 @@ substraction_loop:
     add    esp,    4
 
     add    eax,    [esp]
-    mov    ecx,    255
+    mov    ecx,    FIELD_ORDER
     cdq
     div    ecx
 
