@@ -7,13 +7,13 @@ PAD_BYTE_236                 equ 236
 PAD_BYTE_17                  equ 17
 ENCODING_FACTOR              equ 45
 .code
-extern convert_to_binary : proto
+extern convert_decimal_to_binary : proto
 extern get_symbol_code : proto
-; return 1 if fail, 0 if success
-; take string length,
-; pointer to string ending with 0,
-; buffer size, pointer to buffer as arguments
-encode_data_v1M proc
+; param: string length,
+;     pointer to string ending with 0,
+;     buffer size, pointer to buffer
+; return: 1 if fail, 0 if success
+encode_message_v1M proc
     push   ebp
     mov    ebp,    esp
     push   edi
@@ -43,7 +43,7 @@ encode_data_v1M proc
     push   edi
     push   9
     push   [ebp + 8]
-    call   convert_to_binary
+    call   convert_decimal_to_binary
     add    esp,    12
     add    edi,    9
     ; encode message
@@ -72,8 +72,8 @@ encode_loop:
 
     pop    edx
     ; check for unacceptable symbol
-    cmp    eax,    0
-    jl     error
+    cmp    eax,    -1
+    je     error
 
     add    eax,    edx    
     ; convert to binary and put in the buffer
@@ -81,7 +81,7 @@ encode_loop:
     push   edi
     push   11
     push   eax
-    call   convert_to_binary
+    call   convert_decimal_to_binary
     add    esp,    12
     mov    ecx,    ebx
 
@@ -98,14 +98,14 @@ end_encode_loop:
     call   get_symbol_code
     add    esp,    4
     ; check for unaccepatable symbol
-    cmp    eax,    0
-    jl     error
+    cmp    eax,    -1
+    je     error
 
     ; encode last symbol to 6-bit binary
     push   edi
     push   6
     push   eax
-    call   convert_to_binary
+    call   convert_decimal_to_binary
     add    esp,    12
 
     add    edi,    6
@@ -140,8 +140,12 @@ make_multiple_of_8_loop:
     mov    ebx,    8
     cdq
     div    ebx
-    mov    ecx,    eax
+    mov    ebx,    eax
+    xor    ecx,    ecx
 add_pad_bytes_loop:
+    cmp    ecx,    ebx
+    je     success
+    push   ebx
     push   edi
     push   8
     push   PAD_BYTE_236
@@ -151,14 +155,14 @@ add_pad_bytes_loop:
     mov    edx,    PAD_BYTE_17
     mov    [esp],  edx
 call_convert_to_binary:
-    call convert_to_binary
+    call convert_decimal_to_binary
     add    esp,    12
     
     mov    ecx,    ebx
+    pop    ebx
     add    edi,    8
-    dec    ecx
-    jnz    add_pad_bytes_loop
-    jmp success
+    inc    ecx
+    jmp    add_pad_bytes_loop
 error:
     mov    eax,    1
     jmp    return
@@ -171,5 +175,5 @@ return:
     mov    esp,    ebp
     pop    ebp
     ret
-encode_data_v1M endp
+encode_message_v1M endp
 end

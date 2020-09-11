@@ -1,9 +1,9 @@
 .386
 .model flat, C
 .code
-; return code for symbol in alphanumeric table
-; or -1 if fail
-; take 1-byte char as argument
+; param: 1-byte char as argument
+; return: code for symbol in alphanumeric table
+;     or -1 if fail
 ; TODO: add other symbols
 get_symbol_code proc
     push   ebp
