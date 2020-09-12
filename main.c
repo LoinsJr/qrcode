@@ -1,3 +1,5 @@
+#define SDL_MAIN_HANDLED
+
 #include "include/SDL.h"
 
 #include <stdbool.h>

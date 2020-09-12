@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -g -Wall -o
 
 prog: obj/get_symbol_code.o obj/notation_converters.o obj/get_ec_codewords.o obj/encode_message.o obj/get_bit_sequence.o obj/construct_qr_code.o obj/main.o
-	$(CC) -g -Wall -o prog.exe $^ -Llib/ -lmingw32 -lSDL2main -lSDL2
+	$(CC) -g -Wall -o prog.exe $^ -Llib/ -lSDL2main -lSDL2
 
 obj/main.o: main.c 
 	$(CC) -c $(CFLAGS) $@ $<
