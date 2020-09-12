@@ -33,12 +33,13 @@ bool **construct_qr_code_v1M(int message_length, const char *message)
     enum { BIT_SEQUENCE_SIZE = 208 };
     bool *bit_sequence = calloc(BIT_SEQUENCE_SIZE, sizeof(*bit_sequence));
     int error_code = get_bit_sequence_v1M(message_length, message, BIT_SEQUENCE_SIZE, bit_sequence);
-    printf("%d\n", error_code);
-    for (int i = 0; i < BIT_SEQUENCE_SIZE; ++i)
+    if (error_code)
     {
-        printf("%d", bit_sequence[i]);
+        free(bit_sequence);
+        printf("%d. Something went wrong!", error_code);
+        assert(1);
     }
-    printf("\n");
+    
     bool **qr_code = calloc(V1M_QR_CODE_SIZE, sizeof(*qr_code));
     for (int i = 0; i < V1M_QR_CODE_SIZE; ++i) {
         qr_code[i] = calloc(V1M_QR_CODE_SIZE, sizeof(**qr_code));

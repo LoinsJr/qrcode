@@ -1,7 +1,9 @@
-#include <stdbool.h>
 #include "include/SDL.h"
+
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "construct_qr_code.h"
 
@@ -37,7 +39,14 @@ extern int encode_message_v1M(int, char *, int, bool *);
 
 int main(int argc, char **argv)
 {
-    bool **qr_code = construct_qr_code_v1M(10, "GOOGLE.COM");   
+    if (argc <= 1)
+    {
+        printf("You have to input message for getting QR code\n");
+        return 1;
+    }
+    char *message = argv[1];
+    int message_length = strlen(message);
+    bool **qr_code = construct_qr_code_v1M(message_length, message);   
     draw_qr_code(V1M_QR_CODE_SIZE, qr_code);
     
     return 0;
