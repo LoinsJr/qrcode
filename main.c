@@ -2,17 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern int get_bit_sequence_v1M(int message_length, const char * message, int buffer_size, bool *buffer);
+#include "construct_qr_code.h"
 
 int main(int argc, char **argv)
 {
-    bool *array = calloc(208, sizeof(*array));
-    get_bit_sequence_v1M(11, "HELLO WORLD", 208, array);
-
-    for (int i = 0; i < 208; ++i)
-    {
-        printf("%d", array[i]);
-    }
-
+    bool **q = construct_qr_code_v1M(11, "HELLO WORLD");   
+    print_qr_code(V1M_QR_CODE_SIZE, q);
     return 0;
 }
