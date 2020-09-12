@@ -1,18 +1,22 @@
 .386
 .model flat, C
 .const
-ENCODED_DATA_SIZE equ 128
+ENCODED_DATA_SIZE            equ 128
 MAX_MESSAGE_LENGTH           equ 16
 PAD_BYTE_236                 equ 236
 PAD_BYTE_17                  equ 17
 ENCODING_FACTOR              equ 45
+BUFFER_OVERFLOW_CODE         equ 1
+UNACCEPTABLE_SYMBOL_CODE     equ 2
+
 .code
 extern convert_decimal_to_binary : proto
 extern get_symbol_code : proto
 ; param: string length,
-;     pointer to string ending with 0,
-;     buffer size, pointer to buffer
-; return: 1 if fail, 0 if success
+;     pointer to string,
+;     buffer size,
+;     pointer to buffer
+; return:0 if success, error_code if fail
 encode_message_v1M proc
     push   ebp
     mov    ebp,    esp
@@ -22,11 +26,11 @@ encode_message_v1M proc
     
     mov    eax,    [ebp + 8]
     cmp    eax,    MAX_MESSAGE_LENGTH
-    ja     error
+    ja     error_overflow
     ; check if buffer size is too small
     mov    eax,    [ebp + 16]
     cmp    eax,    ENCODED_DATA_SIZE
-    jb     error
+    jb     error_overflow
     ;encode mode and message length
     mov    esi,    [ebp + 12]
     ; 0010 - alphanumeric mode
@@ -59,7 +63,7 @@ encode_loop:
     add    esp,    4
     ; check for unacceptable symbol
     cmp    eax,    -1
-    je     error
+    je     error_unacceptable_symbol
 
     mov    ebx,    ENCODING_FACTOR
     mul    ebx
@@ -73,7 +77,7 @@ encode_loop:
     pop    edx
     ; check for unacceptable symbol
     cmp    eax,    -1
-    je     error
+    je     error_unacceptable_symbol
 
     add    eax,    edx    
     ; convert to binary and put in the buffer
@@ -99,7 +103,7 @@ end_encode_loop:
     add    esp,    4
     ; check for unaccepatable symbol
     cmp    eax,    -1
-    je     error
+    je     error_unacceptable_symbol
 
     ; encode last symbol to 6-bit binary
     push   edi
@@ -164,8 +168,11 @@ call_convert_to_binary:
     add    edi,    8
     inc    ecx
     jmp    add_pad_bytes_loop
-error:
-    mov    eax,    1
+error_unacceptable_symbol:
+    mov    eax,    UNACCEPTABLE_SYMBOL_CODE
+    jmp    return
+error_overflow:
+    mov    eax,    BUFFER_OVERFLOW_CODE
     jmp    return
 success:
     xor    eax,    eax

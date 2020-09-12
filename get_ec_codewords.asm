@@ -91,7 +91,7 @@ divide_polynomials endp
 ;     encoded message,     
 ;     buffer size,
 ;     pointer to buffer for placing codewords
-; return: 1 if fail, 0 if success
+; return: 0 if success, 1 if fail
 get_ec_codewords_v1M proc
     push   ebp
     mov    ebp,    esp
@@ -101,6 +101,9 @@ get_ec_codewords_v1M proc
     
     ; check if buffer size is enough
     mov    eax,    [ebp + 16]
+    cdq
+    mov    ebx,    8
+    div    ebx
     cmp    eax,    CODEWORDS_AMOUNT
     jb     error
 

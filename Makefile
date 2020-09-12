@@ -1,14 +1,14 @@
 CC = gcc
 CFLAGS = -g -Wall -o
 
-prog: obj/get_symbol_code.o obj/notation_converters.o obj/get_ec_codewords.o obj/encode_message.o obj/main.o
+prog: obj/get_symbol_code.o obj/notation_converters.o obj/get_ec_codewords.o obj/encode_message.o obj/get_bit_sequence.o obj/main.o
 	$(CC) $(CFLAGS) prog.exe $^
 
 obj/main.o: main.c 
 	$(CC) -c $(CFLAGS) $@ $<
 
-#obj/%.o: %.asm
-#    ml /c /Fo $@ $<
+obj/get_bit_sequence.o: get_bit_sequence.asm
+	ml /c /Fo $@ $<
 
 obj/get_ec_codewords.o: get_ec_codewords.asm
 	ml /c /Fo $@ $<
