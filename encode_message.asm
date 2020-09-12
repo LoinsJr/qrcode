@@ -146,10 +146,11 @@ add_pad_bytes_loop:
     cmp    ecx,    ebx
     je     success
     push   ebx
+    mov    ebx,    ecx ; save register ecx
+
     push   edi
     push   8
     push   PAD_BYTE_236
-    mov    ebx,    ecx ; save register ecx
     and    ecx,    1
     jz     call_convert_to_binary
     mov    edx,    PAD_BYTE_17

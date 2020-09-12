@@ -10,27 +10,9 @@ dividend_polynomial db 26 dup(0)
 divider_polynomial  db 1, 216, 194, 159, 111, 199, 94, 95, 113, 157, 193
 .code
 extern convert_binary_to_decimal : proto
+extern convert_decimal_to_binary : proto
 extern convert_decimal_to_alpha_notation : proto
 extern convert_alpha_notation_to_decimal : proto
-
-break proc
-    push   ebp
-    mov    ebp,    esp
-
-    mov   esp,  ebp
-    pop  ebp
-    ret
-break endp
-
-break2 proc
-    push   ebp
-    mov    ebp,    esp
-
-    mov   esp,  ebp
-    pop  ebp
-    ret
-break2 endp
-
 
 ; divide dividend_polynomial and divider_polynomial
 ; result is written in dividend_polynomial
@@ -83,7 +65,6 @@ substraction_loop:
     pop    eax
     mov    ecx,    ebx
     dec    ecx
-    call   break2
     inc    edi
     inc    esi
     jmp    substraction_loop
@@ -94,7 +75,6 @@ end_substraction_loop:
     dec    ecx
     cmp    ecx,    10
     ja     divide_loop
-    call   break
     mov    eax,    edi
     jmp    divide_loop
 end_divide_loop:
@@ -151,6 +131,29 @@ fill_dividend_polynomial_loop:
     jmp    fill_dividend_polynomial_loop
 end_fill_dividend_polynomial_loop:
     call   divide_polynomials
+    mov    esi,    eax
+    mov    edi,    [ebp + 20]
+    mov    ecx,    CODEWORDS_AMOUNT
+    xor    ebx,    ebx
+move_codewords_to_buffer_loop:
+    test   ecx,    ecx
+    jz     end_move_codewords_to_buffer_loop
+    push   ecx
+
+    push   edi
+    push   8 
+    mov    bl,     [esi]
+    push   ebx
+    call   convert_decimal_to_binary
+    add    esp,    12
+    
+    pop    ecx
+    add    edi,    8
+    inc    esi
+    dec    ecx
+    jmp    move_codewords_to_buffer_loop
+end_move_codewords_to_buffer_loop:
+    xor    eax,    eax
     jmp    return
 error:
     mov    eax,    1
